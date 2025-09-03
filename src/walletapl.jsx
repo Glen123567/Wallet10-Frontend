@@ -96,7 +96,7 @@ const FuturisticStyles = () => (
 
 
 // --------------------------- Backend API wrapper ---------------------------
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://chatbackend-ziin.onrender.com";
 
 const api = {
   // Auth endpoints
