@@ -1,145 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Send, LogOut, Wallet as WalletIcon, Unlock, ArrowLeft } from 'lucide-react';
 
-// --- Futuristic UI Styles ---
-const FuturisticStyles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
-
-    :root {
-      --primary-glow: #00f6ff;
-      --secondary-glow: #ff00c1;
-      --background-dark: #0a0a14;
-      --background-light: #1a1a2e;
-      --text-color: #e0e0ff;
-      --border-color: rgba(0, 246, 255, 0.2);
-      --error-color: #ff4444;
-      --success-color: #44ff44;
-    }
-
-    body {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--text-color);
-      text-shadow: 0 0 2px rgba(0, 246, 255, 0.3);
-    }
-
-    .cyber-card {
-      background: rgba(16, 16, 32, 0.6);
-      backdrop-filter: blur(12px) saturate(150%);
-      -webkit-backdrop-filter: blur(12px) saturate(150%);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 0 15px rgba(0, 246, 255, 0.1), 0 0 30px rgba(0, 246, 255, 0.05);
-      position: relative;
-    }
-    
-    .cyber-input {
-      background: rgba(10, 10, 20, 0.8);
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-      caret-color: var(--primary-glow);
-      color: var(--text-color);
-    }
-
-    .cyber-input:focus {
-      outline: none;
-      border-color: var(--primary-glow);
-      box-shadow: 0 0 15px rgba(0, 246, 255, 0.5);
-    }
-
-    .cyber-input.error {
-      border-color: var(--error-color);
-      box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
-    }
-
-    .cyber-input.success {
-      border-color: var(--success-color);
-      box-shadow: 0 0 15px rgba(68, 255, 68, 0.3);
-    }
-    
-    .animated-grid {
-      width: 100vw;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      background-image:
-        linear-gradient(to right, rgba(0, 246, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 246, 255, 0.1) 1px, transparent 1px);
-      background-size: 40px 40px;
-      animation: moveGrid 10s linear infinite;
-    }
-    
-    @keyframes moveGrid {
-      from { background-position: 0 0; }
-      to { background-position: 40px 40px; }
-    }
-
-    .validation-error {
-      color: var(--error-color);
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
-      display: block;
-      opacity: 0.9;
-    }
-
-    .validation-success {
-      color: var(--success-color);
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
-      display: block;
-      opacity: 0.9;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, #00f6ff 0%, #0099cc 100%);
-      border: 1px solid #00f6ff;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    .btn:hover {
-      background: linear-gradient(135deg, #00f6ff 20%, #0099cc 80%);
-      box-shadow: 0 0 20px rgba(0, 246, 255, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, #ff00c1 0%, #cc0099 100%);
-      border-color: #ff00c1;
-    }
-
-    .btn-secondary:hover {
-      background: linear-gradient(135deg, #ff00c1 20%, #cc0099 80%);
-      box-shadow: 0 0 20px rgba(255, 0, 193, 0.4);
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-      border-color: #ff4444;
-    }
-
-    .btn-danger:hover {
-      background: linear-gradient(135deg, #ff4444 20%, #cc0000 80%);
-      box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
-    }
-  `}</style>
-);
-
-// --------------------------- In-Memory Storage (No localStorage) ---------------------------
+// In-Memory Storage (No localStorage for Vercel compatibility)
 let authStorage = null;
 
 const AuthStorage = {
@@ -148,7 +10,7 @@ const AuthStorage = {
   clearAuth: () => { authStorage = null; },
 };
 
-// --------------------------- Backend API wrapper ---------------------------
+// Backend API wrapper
 const API_BASE = "https://chatbackend-ziin.onrender.com/api";
 
 const api = {
@@ -176,9 +38,7 @@ const api = {
   },
 
   deleteAllUsers: async () => {
-    const response = await fetch(`${API_BASE}/users`, {
-      method: 'DELETE'
-    });
+    const response = await fetch(`${API_BASE}/users`, { method: 'DELETE' });
     return response.json();
   },
 
@@ -197,19 +57,16 @@ const api = {
   },
 
   deleteAllMessages: async () => {
-    const response = await fetch(`${API_BASE}/messages`, {
-      method: 'DELETE'
-    });
+    const response = await fetch(`${API_BASE}/messages`, { method: 'DELETE' });
     return response.json();
   }
 };
 
-// --------------------------- Form Validation Functions ---------------------------
+// Form Validation Functions
 const validators = {
   username: (value) => {
     if (!value || value.trim().length === 0) return "Username is required";
     if (value.trim().length < 3) return "Username must be at least 3 characters";
-    if (value.trim().length > 20) return "Username must be less than 20 characters";
     if (!/^[a-zA-Z0-9_]+$/.test(value.trim())) return "Username can only contain letters, numbers, and underscores";
     return null;
   },
@@ -220,7 +77,6 @@ const validators = {
     if (!/(?=.*[a-z])/.test(value)) return "Password must contain at least one lowercase letter";
     if (!/(?=.*[A-Z])/.test(value)) return "Password must contain at least one uppercase letter";
     if (!/(?=.*\d)/.test(value)) return "Password must contain at least one number";
-    if (!/(?=.*[@$!%*?&])/.test(value)) return "Password must contain at least one special character (@$!%*?&)";
     return null;
   },
 
@@ -241,42 +97,38 @@ const validators = {
 
   dob: (value) => {
     if (!value) return "Date of birth is required";
-    const selectedDate = new Date(value);
-    const today = new Date();
-    const minAge = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-    const maxAge = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
-    
-    if (selectedDate > minAge) return "You must be at least 13 years old";
-    if (selectedDate < maxAge) return "Please enter a valid date of birth";
     return null;
   },
 
   walletAddress: (value) => {
     if (!value || value.trim().length === 0) return "Wallet address is required";
-    // Basic Ethereum address validation
     if (!/^0x[a-fA-F0-9]{40}$/.test(value.trim())) return "Please enter a valid Ethereum address";
     return null;
   }
 };
 
-// --------------------------- Dummy crypto placeholders ---------------------------
 const dummyHash = () => "0x" + Math.random().toString(16).slice(2).padEnd(64, "0");
 
-// --------------------------- Enhanced UI Components ---------------------------
+// UI Components
 function Button({ children, className = "", variant = "primary", onClick, disabled, ...props }) {
-    const getVariantClass = () => {
+    const getButtonClass = () => {
+        const base = "px-6 py-3 rounded-lg font-bold text-white transition-all duration-300 border";
         switch(variant) {
-            case 'secondary': return 'btn btn-secondary';
-            case 'danger': return 'btn btn-danger';
-            default: return 'btn';
+            case 'secondary':
+                return `${base} bg-pink-600 border-pink-500 hover:bg-pink-500 ${className}`;
+            case 'danger':
+                return `${base} bg-red-600 border-red-500 hover:bg-red-500 ${className}`;
+            default:
+                return `${base} bg-cyan-600 border-cyan-500 hover:bg-cyan-500 ${className}`;
         }
     };
 
     return (
         <button
-            className={`${getVariantClass()} ${className}`}
+            className={getButtonClass()}
             onClick={onClick}
             disabled={disabled}
+            style={{ opacity: disabled ? 0.5 : 1 }}
             {...props}
         >
             {children}
@@ -284,16 +136,14 @@ function Button({ children, className = "", variant = "primary", onClick, disabl
     );
 }
 
-function ValidatedInput({ name, type = "text", placeholder, value, onChange, validator, className = "", ...props }) {
+function ValidatedInput({ name, type = "text", placeholder, value, onChange, validator, className = "" }) {
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
 
   const handleChange = (e) => {
-    const newValue = e.target.value;
     onChange(e);
-    
     if (touched && validator) {
-      const validationError = validator(newValue);
+      const validationError = validator(e.target.value);
       setError(validationError || "");
     }
   };
@@ -306,12 +156,9 @@ function ValidatedInput({ name, type = "text", placeholder, value, onChange, val
     }
   };
 
-  const getInputClassName = () => {
-    let classes = `w-full px-4 py-3 rounded-lg cyber-input ${className}`;
-    if (touched && error) classes += " error";
-    else if (touched && !error && value) classes += " success";
-    return classes;
-  };
+  const inputClass = `w-full px-4 py-3 rounded-lg bg-slate-800 border text-white ${
+    touched && error ? 'border-red-500' : 'border-slate-600'
+  } ${className}`;
 
   return (
     <div className="w-full">
@@ -322,14 +169,13 @@ function ValidatedInput({ name, type = "text", placeholder, value, onChange, val
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
-        className={getInputClassName()}
-        {...props}
+        className={inputClass}
       />
       {touched && error && (
-        <span className="validation-error">{error}</span>
+        <span className="text-red-400 text-sm mt-1 block">{error}</span>
       )}
       {touched && !error && value && (
-        <span className="validation-success">✓ Valid</span>
+        <span className="text-green-400 text-sm mt-1 block">✓ Valid</span>
       )}
     </div>
   );
@@ -337,21 +183,18 @@ function ValidatedInput({ name, type = "text", placeholder, value, onChange, val
 
 function Navbar({ title, onBack, onLogout, user }) {
   return (
-    <div className="flex flex-col w-full max-w-7xl mb-8 relative">
-      <div className="flex items-center justify-center relative bg-black/20 p-4 rounded-lg border border-[var(--border-color)]">
+    <div className="w-full max-w-7xl mb-8">
+      <div className="flex items-center justify-center relative bg-slate-900 p-4 rounded-lg border border-slate-700">
         {onBack && (
           <button
             onClick={onBack}
-            className="absolute left-4 flex items-center gap-2 text-[var(--primary-glow)] hover:text-white px-3 py-2 rounded-lg backdrop-blur-sm"
+            className="absolute left-4 flex items-center gap-2 text-cyan-400 hover:text-white px-3 py-2 rounded-lg"
           >
             <ArrowLeft size={20} /> Back
           </button>
         )}
         
-        <h1 
-          className="text-3xl font-bold flex items-center gap-4 justify-center"
-          style={{color: 'var(--primary-glow)', textShadow: '0 0 10px var(--primary-glow)'}}
-        >
+        <h1 className="text-3xl font-bold flex items-center gap-4 text-cyan-400">
           <WalletIcon size={32} />
           {title}
         </h1>
@@ -359,7 +202,7 @@ function Navbar({ title, onBack, onLogout, user }) {
         {user && (
           <button
             onClick={onLogout}
-            className="absolute right-4 flex items-center gap-2 text-[var(--secondary-glow)] hover:text-white px-3 py-2 rounded-lg"
+            className="absolute right-4 flex items-center gap-2 text-pink-400 hover:text-white px-3 py-2 rounded-lg"
           >
             <LogOut size={20} /> Logout
           </button>
@@ -371,23 +214,18 @@ function Navbar({ title, onBack, onLogout, user }) {
 
 function Card({ title, children, footer }) {
   return (
-    <div className="cyber-card w-full max-w-xl rounded-2xl p-6 relative overflow-hidden">
-      <div className="relative z-10">
-        {title && (
-          <h2 
-            className="text-2xl font-bold mb-6 text-center uppercase"
-            style={{ color: 'var(--primary-glow)', textShadow: '0 0 8px var(--primary-glow)'}}
-          >
-            {title}
-          </h2>
-        )}
-        
-        <div>{children}</div>
-        
-        {footer && (
-          <div className="mt-6">{footer}</div>
-        )}
-      </div>
+    <div className="bg-slate-900 border border-slate-700 w-full max-w-xl rounded-2xl p-6">
+      {title && (
+        <h2 className="text-2xl font-bold mb-6 text-center text-cyan-400">
+          {title}
+        </h2>
+      )}
+      
+      <div>{children}</div>
+      
+      {footer && (
+        <div className="mt-6">{footer}</div>
+      )}
     </div>
   );
 }
@@ -398,9 +236,9 @@ function MessageBubble({ m, currentUser }) {
   if (isSentByMe) {
     return (
       <div className="w-full flex justify-end mb-4">
-        <div className="max-w-md p-4 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-cyan-500/10 to-transparent border-2 border-cyan-500/50 rounded-br-none shadow-lg">
-          <p className="text-sm break-words leading-relaxed">{m.text}</p>
-          <span className="text-xs opacity-60 mt-2 block text-right">
+        <div className="max-w-md p-4 rounded-2xl bg-cyan-600 text-white shadow-lg">
+          <p className="text-sm break-words">{m.text}</p>
+          <span className="text-xs opacity-70 mt-2 block text-right">
             {new Date(m.createdAt || Date.now()).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit'
@@ -412,10 +250,10 @@ function MessageBubble({ m, currentUser }) {
   } else {
     return (
       <div className="w-full flex justify-start mb-4">
-        <div className="max-w-md p-4 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700/80 rounded-bl-none shadow-lg">
-          <p className="text-sm font-bold text-pink-400 mb-2 tracking-wider">{m.sender}</p>
-          <p className="text-sm break-words leading-relaxed">{m.text}</p>
-          <span className="text-xs opacity-60 mt-2 block text-right">
+        <div className="max-w-md p-4 rounded-2xl bg-slate-700 text-white shadow-lg">
+          <p className="text-sm font-bold text-pink-400 mb-2">{m.sender}</p>
+          <p className="text-sm break-words">{m.text}</p>
+          <span className="text-xs opacity-70 mt-2 block text-right">
             {new Date(m.createdAt || Date.now()).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit'
@@ -428,33 +266,30 @@ function MessageBubble({ m, currentUser }) {
 }
 
 function UserItem({ u, selected, onClick }) {
-    const isSelected = selected;
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-4 w-full p-3 rounded-lg border transition-all duration-300 relative overflow-hidden ${
-                isSelected
-                ? "bg-cyan-500/30 border-cyan-400 shadow-[0_0_15px_rgba(0,246,255,0.5)]"
-                : "bg-black/30 border-[var(--border-color)] hover:bg-cyan-500/10"
+            className={`flex items-center gap-4 w-full p-3 rounded-lg border transition-all duration-300 ${
+                selected
+                ? "bg-cyan-600 border-cyan-400 text-white"
+                : "bg-slate-800 border-slate-600 hover:bg-slate-700 text-white"
             }`}
         >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
+            <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-white">
                 <User size={18} />
             </div>
             
             <div className="text-left flex-1">
-                <div className="font-bold tracking-wider">{u.username}</div>
-                <div className="text-xs text-cyan-300/70 truncate font-mono">{u.walletAddress}</div>
+                <div className="font-bold">{u.username}</div>
+                <div className="text-xs opacity-70 truncate">{u.walletAddress}</div>
             </div>
             
-            <div
-                className={`w-3 h-3 rounded-full shadow-lg transition-all ${isSelected ? 'bg-green-400 shadow-green-400/50' : 'bg-slate-500'}`}
-            />
+            <div className={`w-3 h-3 rounded-full ${selected ? 'bg-green-400' : 'bg-slate-500'}`} />
         </button>
     );
 }
 
-// --------------------------- Main App ---------------------------
+// Main App Component
 export default function App() {
   const [step, setStep] = useState("connect");
   const [connectedAddress, setConnectedAddress] = useState("");
@@ -510,7 +345,7 @@ export default function App() {
     }
   };
 
-  async function connectMetaMask() {
+  const connectMetaMask = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -519,8 +354,7 @@ export default function App() {
           return;
         }
         const addr = accounts[0];
-        const authData = { address: addr, ts: Date.now() };
-        AuthStorage.setAuth(authData);
+        AuthStorage.setAuth({ address: addr, ts: Date.now() });
         setConnectedAddress(addr);
         setStep("chooseAuth");
       } catch (err) {
@@ -530,9 +364,9 @@ export default function App() {
     } else {
       alert("MetaMask not detected. Please install MetaMask.");
     }
-  }
+  };
 
-  function connectManual() {
+  const connectManual = () => {
     const validationError = validators.walletAddress(manualAddress);
     if (validationError) {
       alert(validationError);
@@ -542,37 +376,37 @@ export default function App() {
     setConnectedAddress(addr);
     AuthStorage.setAuth({ address: addr, ts: Date.now() });
     setStep("chooseAuth");
-  }
+  };
 
-  function clearAllSessionData() {
+  const clearAllSessionData = () => {
     setSession(null);
     setPartner(null);
     setUsers([]);
     setMsgs([]);
     setMessage("");
     setForm({ username: "", password: "", email: "", phone: "", dob: "" });
-  }
+  };
 
-  function clearWalletData() {
+  const clearWalletData = () => {
     setConnectedAddress("");
     setManualAddress("");
-  }
+  };
 
-  function handleLogout() {
+  const handleLogout = () => {
     AuthStorage.clearAuth();
     clearAllSessionData();
     clearWalletData();
     setStep("connect");
-  }
+  };
 
-  function handleDisconnect() {
+  const handleDisconnect = () => {
     AuthStorage.clearAuth();
     clearAllSessionData();
     clearWalletData();
     setStep("connect");
-  }
+  };
 
-  function navigateToStep(newStep) {
+  const navigateToStep = (newStep) => {
     if ((step === "register" || step === "login") && (newStep === "register" || newStep === "login" || newStep === "chooseAuth")) {
       setForm({ username: "", password: "", email: "", phone: "", dob: "" });
     }
@@ -586,9 +420,9 @@ export default function App() {
     }
     
     setStep(newStep);
-  }
+  };
 
-  async function register() {
+  const register = async () => {
     if (!validateForm()) {
       alert("Please fix all validation errors before registering.");
       return;
@@ -612,9 +446,9 @@ export default function App() {
       console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
     }
-  }
+  };
 
-  async function login() {
+  const login = async () => {
     const usernameError = validators.username(form.username);
     const passwordError = validators.password(form.password);
     
@@ -643,9 +477,9 @@ export default function App() {
       console.error("Login error:", error);
       alert("Login failed. Please try again.");
     }
-  }
+  };
 
-  async function sendMsg() {
+  const sendMsg = async () => {
     if (!message.trim() || !partner) return;
 
     try {
@@ -666,9 +500,9 @@ export default function App() {
       console.error("Send message error:", error);
       alert("Failed to send message. Please try again.");
     }
-  }
+  };
 
-  async function clearAllUsers() {
+  const clearAllUsers = async () => {
     if (window.confirm("Are you sure? This will delete ALL registered users and messages.")) {
       try {
         await api.deleteAllUsers();
@@ -686,16 +520,13 @@ export default function App() {
         alert("Failed to clear users. Please try again.");
       }
     }
-  }
+  };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a14] text-slate-100 flex flex-col items-center py-10 px-4 relative overflow-hidden">
-      <FuturisticStyles />
-      <div className="animated-grid" />
-
-      <div className="w-full max-w-7xl relative z-10">
+    <div className="min-h-screen w-full bg-slate-900 text-white flex flex-col items-center py-10 px-4">
+      <div className="w-full max-w-7xl">
         <Navbar
           title="Cyber Secure Chat"
           onBack={step === "chooseAuth" ? handleDisconnect : (step !== "connect" && step !== "chat" ? () => navigateToStep("chooseAuth") : null)}
@@ -866,7 +697,7 @@ export default function App() {
 
               <div className="lg:col-span-2">
                 <Card title={partner ? `Channel: ${partner.username}` : "Select Contact"}>
-                  <div className="h-[50vh] overflow-y-auto space-y-2 mb-6 pr-2 bg-black/20 rounded-lg p-4 border border-[var(--border-color)]">
+                  <div className="h-[50vh] overflow-y-auto space-y-2 mb-6 pr-2 bg-slate-800 rounded-lg p-4 border border-slate-600">
                     {partner ? (
                       thread.length ? (
                         <div className="space-y-2">
@@ -889,7 +720,7 @@ export default function App() {
                   {partner && (
                     <div className="flex gap-3">
                       <input
-                        className="flex-1 px-4 py-3 rounded-lg cyber-input"
+                        className="flex-1 px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white"
                         placeholder={`Message ${partner.username}...`}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
